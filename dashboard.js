@@ -405,19 +405,22 @@ export class Dashboard {
             frames: framesClean
         };
 
-        // Don't end session, just emit
         // Log size for debugging
         const payloadSize = JSON.stringify(replayData).length;
         console.log(`Dispatching render-replay. Payload size: approx ${Math.round(payloadSize/1024)}KB`);
 
-        window.dispatchEvent(new CustomEvent('render-replay', { 
-            detail: replayData 
-        }));
-
-        // Force exit VR to prevent rendering hang/throttle and ensure reliable capture
+        // Force exit VR to perform rendering in 2D mode
+        // This prevents the "hang" caused by running heavy render tasks + React overlay inside the immersive session
         if (this.renderer.xr.isPresenting) {
-            this.renderer.xr.getSession().end();
+            this.renderer.xr.getSession()?.end();
         }
+
+        // Add a delay to allow the browser to exit VR and stabilize the DOM/2D view before starting the recorder
+        setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('render-replay', { 
+                detail: replayData 
+            }));
+        }, 1000);
         
         this.updateBtn(1, "RENDERING...", '#555555');
     }

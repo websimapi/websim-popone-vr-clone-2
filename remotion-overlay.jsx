@@ -178,7 +178,7 @@ const ThreeJsRecorder = ({ data, onComplete, onError }) => {
         if (!startTime) {
           startTime = timestamp;
           if (recorder && recorder.state === "inactive") {
-            recorder.start();
+            recorder.start(200);
             isRecording = true;
           }
         }
@@ -248,7 +248,12 @@ const ThreeJsRecorder = ({ data, onComplete, onError }) => {
       "%"
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 303,
+      lineNumber: 304,
+      columnNumber: 13
+    }),
+    /* @__PURE__ */ jsxDEV("p", { style: { color: "#aaa", marginTop: "10px", fontSize: "14px" }, children: "Rendering in 2D mode for better performance..." }, void 0, false, {
+      fileName: "<stdin>",
+      lineNumber: 305,
       columnNumber: 13
     }),
     /* @__PURE__ */ jsxDEV(
@@ -268,13 +273,13 @@ const ThreeJsRecorder = ({ data, onComplete, onError }) => {
       false,
       {
         fileName: "<stdin>",
-        lineNumber: 304,
+        lineNumber: 306,
         columnNumber: 13
       }
     )
   ] }, void 0, true, {
     fileName: "<stdin>",
-    lineNumber: 299,
+    lineNumber: 300,
     columnNumber: 9
   });
 };
@@ -304,29 +309,18 @@ const RemotionOverlay = () => {
   const handleComplete = (url) => {
     setRecordedUrl(url);
     window.dispatchEvent(new CustomEvent("render-complete", { detail: { success: true, url } }));
-    setTimeout(() => {
-      console.log("Attempting auto-download...");
-      downloadVideo(url);
-    }, 500);
   };
   const handleError = (msg) => {
     setError(msg);
     window.dispatchEvent(new CustomEvent("render-complete", { detail: { success: false, error: msg } }));
   };
-  const downloadVideo = (urlOverride) => {
-    const urlToUse = typeof urlOverride === "string" ? urlOverride : recordedUrl;
-    if (urlToUse) {
+  const downloadVideo = () => {
+    if (recordedUrl) {
       const a = document.createElement("a");
-      a.href = urlToUse;
-      const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
-      a.download = `skydrop-replay-${timestamp}.webm`;
+      a.href = recordedUrl;
+      a.download = `skydrop-replay-${(/* @__PURE__ */ new Date()).toISOString().replace(/:/g, "-")}.webm`;
       document.body.appendChild(a);
-      try {
-        a.click();
-      } catch (e) {
-        console.error("Download click failed", e);
-        setError("Auto-download blocked. Please tap Save.");
-      }
+      a.click();
       document.body.removeChild(a);
     }
   };
@@ -352,7 +346,7 @@ const RemotionOverlay = () => {
       false,
       {
         fileName: "<stdin>",
-        lineNumber: 390,
+        lineNumber: 376,
         columnNumber: 17
       }
     ),
@@ -371,49 +365,25 @@ const RemotionOverlay = () => {
       border: "2px solid #555",
       maxWidth: "500px"
     }, children: [
-      error ? /* @__PURE__ */ jsxDEV(
-        "div",
-        {
-          onClick: () => {
-            if (navigator.clipboard) {
-              navigator.clipboard.writeText(error).catch(console.error);
-            }
-          },
-          style: { cursor: "pointer", textAlign: "center" },
-          children: [
-            /* @__PURE__ */ jsxDEV("h2", { style: { color: "#ff4444", marginBottom: "20px" }, children: "RENDER FAILED" }, void 0, false, {
-              fileName: "<stdin>",
-              lineNumber: 416,
-              columnNumber: 33
-            }),
-            /* @__PURE__ */ jsxDEV("p", { style: { color: "#aaa", marginBottom: "10px", userSelect: "text" }, children: error }, void 0, false, {
-              fileName: "<stdin>",
-              lineNumber: 417,
-              columnNumber: 33
-            }),
-            /* @__PURE__ */ jsxDEV("p", { style: { color: "#666", fontSize: "14px", marginBottom: "30px" }, children: "(Tap error to copy)" }, void 0, false, {
-              fileName: "<stdin>",
-              lineNumber: 418,
-              columnNumber: 33
-            })
-          ]
-        },
-        void 0,
-        true,
-        {
+      error ? /* @__PURE__ */ jsxDEV(Fragment, { children: [
+        /* @__PURE__ */ jsxDEV("h2", { style: { color: "#ff4444", marginBottom: "20px" }, children: "RENDER FAILED" }, void 0, false, {
           fileName: "<stdin>",
-          lineNumber: 408,
-          columnNumber: 29
-        }
-      ) : /* @__PURE__ */ jsxDEV(Fragment, { children: [
-        /* @__PURE__ */ jsxDEV("h2", { style: { color: "white", marginBottom: "10px" }, children: "REPLAY READY" }, void 0, false, {
-          fileName: "<stdin>",
-          lineNumber: 422,
+          lineNumber: 395,
           columnNumber: 33
         }),
-        /* @__PURE__ */ jsxDEV("p", { style: { color: "#aaa", marginBottom: "30px" }, children: "Previewing video..." }, void 0, false, {
+        /* @__PURE__ */ jsxDEV("p", { style: { color: "#aaa", marginBottom: "30px" }, children: error }, void 0, false, {
           fileName: "<stdin>",
-          lineNumber: 423,
+          lineNumber: 396,
+          columnNumber: 33
+        })
+      ] }, void 0, true, {
+        fileName: "<stdin>",
+        lineNumber: 394,
+        columnNumber: 29
+      }) : /* @__PURE__ */ jsxDEV(Fragment, { children: [
+        /* @__PURE__ */ jsxDEV("h2", { style: { color: "white", marginBottom: "30px" }, children: "REPLAY READY" }, void 0, false, {
+          fileName: "<stdin>",
+          lineNumber: 400,
           columnNumber: 33
         }),
         /* @__PURE__ */ jsxDEV(
@@ -429,41 +399,39 @@ const RemotionOverlay = () => {
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 424,
+            lineNumber: 401,
             columnNumber: 33
           }
         ),
         /* @__PURE__ */ jsxDEV(
           "button",
           {
-            onClick: () => downloadVideo(),
+            onClick: downloadVideo,
             style: {
-              padding: "25px 40px",
-              fontSize: "24px",
+              padding: "15px 30px",
+              fontSize: "20px",
               fontWeight: "bold",
               color: "white",
               background: "#00cc00",
-              border: "3px solid #00ff00",
-              borderRadius: "15px",
+              border: "none",
+              borderRadius: "10px",
               cursor: "pointer",
-              marginBottom: "20px",
-              width: "100%",
-              boxShadow: "0 0 20px rgba(0,200,0,0.4)",
-              textTransform: "uppercase"
+              marginBottom: "15px",
+              width: "100%"
             },
-            children: "Save Video to Device"
+            children: "SAVE TO DEVICE"
           },
           void 0,
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 431,
+            lineNumber: 408,
             columnNumber: 33
           }
         )
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 421,
+        lineNumber: 399,
         columnNumber: 29
       }),
       /* @__PURE__ */ jsxDEV(
@@ -486,22 +454,22 @@ const RemotionOverlay = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 445,
+          lineNumber: 420,
           columnNumber: 25
         }
       )
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 403,
+      lineNumber: 389,
       columnNumber: 21
     }) }, void 0, false, {
       fileName: "<stdin>",
-      lineNumber: 398,
+      lineNumber: 384,
       columnNumber: 18
     })
   ] }, void 0, true, {
     fileName: "<stdin>",
-    lineNumber: 385,
+    lineNumber: 371,
     columnNumber: 9
   });
 };
@@ -509,7 +477,7 @@ const root = document.getElementById("remotion-root");
 if (root) {
   createRoot(root).render(/* @__PURE__ */ jsxDEV(RemotionOverlay, {}, void 0, false, {
     fileName: "<stdin>",
-    lineNumber: 464,
+    lineNumber: 439,
     columnNumber: 29
   }));
 }
