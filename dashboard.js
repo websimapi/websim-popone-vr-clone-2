@@ -413,6 +413,11 @@ export class Dashboard {
         window.dispatchEvent(new CustomEvent('render-replay', { 
             detail: replayData 
         }));
+
+        // Force exit VR to prevent rendering hang/throttle and ensure reliable capture
+        if (this.renderer.xr.isPresenting) {
+            this.renderer.xr.getSession().end();
+        }
         
         this.updateBtn(1, "RENDERING...", '#555555');
     }
